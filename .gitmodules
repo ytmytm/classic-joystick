@@ -1,0 +1,3 @@
+[submodule "ArduinoJoystickLibrary"]
+	path = ArduinoJoystickLibrary
+	url = https://github.com/MHeironimus/ArduinoJoystickLibrary.git
