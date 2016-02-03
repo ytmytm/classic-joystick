@@ -35,6 +35,8 @@
 // GND -> joystick 2 GND (8)
 // A2 -> joystick 2 POTX (9)
 
+#include "Joystick2.h"
+
 void setup() {
   // joy1
   pinMode(A1,INPUT_PULLUP); // poty
@@ -53,39 +55,71 @@ void setup() {
   pinMode(5,INPUT_PULLUP); // down
   pinMode(4,INPUT_PULLUP); // up
 
-  while (!Serial);
-
-  Serial.println("Hello!");
+  Joystick[0].begin();
+  Joystick[1].begin();
+  delay(500);
+  Joystick[0].setXAxis(0);
+  Joystick[0].setYAxis(0);
+  Joystick[1].setXAxis(0);
+  Joystick[1].setYAxis(0);
 }
 
-uint8_t lastJoy1=0;
-uint8_t lastJoy2=0;
+int state1x=0, state1y=0, state2x=0, state2y=0;
 
 void loop() {
   uint8_t joy1=0;
-  if (!digitalRead(9)) joy1 |= 1; joy1 = joy1 << 1;
-  if (!digitalRead(10)) joy1 |= 1; joy1 = joy1 << 1;
-  if (!digitalRead(16)) joy1 |= 1; joy1 = joy1 << 1;
-  if (!digitalRead(14)) joy1 |= 1; joy1 = joy1 << 1;
-  if (!digitalRead(15)) joy1 |= 1;
-  if (joy1!=lastJoy1) {
-    Serial.print("Joy1:");
-    Serial.println(joy1,HEX);
-    lastJoy1=joy1;
+  uint8_t state1, state2;
+  int state;
+
+  // reversed logic because closed switch connects to GND, open is pulled up
+  // fire
+  state = digitalRead(9) ? 0 : 1;
+  Joystick[0].setButton(0,state);
+  // fire
+  state = digitalRead(8) ? 0 : 1;
+  Joystick[1].setButton(0,state);
+  // right / left
+  state1 = !digitalRead(16); // left
+  state2 = !digitalRead(10); // right
+  state = 0;
+  if (state1) state=-127;
+  if (state2) state=127;
+  if (state!=state1x) {
+    state1x = state;
+    Joystick[0].setXAxis(state1x);
+  }
+  // right / left
+  state1 = !digitalRead(6); // left
+  state2 = !digitalRead(7); // right
+  state = 0;
+  if (state1) state=-127;
+  if (state2) state=127;
+  if (state!=state2x) {
+    state2x = state;
+    Joystick[1].setXAxis(state2x);
+  }
+  //
+  // up / down
+  state1 = !digitalRead(15); // up
+  state2 = !digitalRead(14); // down
+  state = 0;
+  if (state1) state=-127;
+  if (state2) state=127;
+  if (state!=state1y) {
+    state1y = state;
+    Joystick[0].setYAxis(state1y);
+  }
+  // up / down
+  state1 = !digitalRead(4); // up
+  state2 = !digitalRead(5); // down
+  state = 0;
+  if (state1) state=-127;
+  if (state2) state=127;
+  if (state!=state2y) {
+    state2y = state;
+    Joystick[1].setYAxis(state2y);
   }
 
-  uint8_t joy2=0;
-  if (!digitalRead(8)) joy2 |= 1; joy2 = joy2 << 1;
-  if (!digitalRead(7)) joy2 |= 1; joy2 = joy2 << 1;
-  if (!digitalRead(6)) joy2 |= 1; joy2 = joy2 << 1;
-  if (!digitalRead(5)) joy2 |= 1; joy2 = joy2 << 1;
-  if (!digitalRead(4)) joy2 |= 1;
-  if (joy2!=lastJoy2) {
-    Serial.print("Joy2:");
-    Serial.println(joy2,HEX);
-    lastJoy2=joy2;
-  }
-
-  delay(20);
+  delay(10);
 }
 
