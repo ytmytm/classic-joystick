@@ -1,9 +1,9 @@
 
 // 2015, Maciej Witkowiak <mwitkowiak@gmail.com>
 
-// simple test for checking all the connections to two digital
-// digital (8-bit era) joysticks
-// note: this doesn't check for POTX/POTY lines
+// support for C64/128 joystick:
+// 5-way control+1 fire button
+// potx/y lines are connected but not handled
 
 // DB9 joystick cable (front, looking at holes)
 // 54321
@@ -55,29 +55,30 @@ void setup() {
   pinMode(5,INPUT_PULLUP); // down
   pinMode(4,INPUT_PULLUP); // up
 
-  Joystick[0].begin();
   Joystick[1].begin();
-  delay(500);
-  Joystick[0].setXAxis(0);
-  Joystick[0].setYAxis(0);
-  Joystick[1].setXAxis(0);
-  Joystick[1].setYAxis(0);
+  Joystick[0].begin();
 }
 
-int state1x=0, state1y=0, state2x=0, state2y=0;
+int state1x=0, state1y=0, state2x=0, state2y=0, fire1=0, fire2=0;
 
 void loop() {
   uint8_t joy1=0;
   uint8_t state1, state2;
-  int state;
+  int8_t state;
 
   // reversed logic because closed switch connects to GND, open is pulled up
   // fire
   state = digitalRead(9) ? 0 : 1;
-  Joystick[0].setButton(0,state);
+  if (state!=fire1) {
+    fire1 = state;
+    Joystick[0].setButton(0,fire1);
+  }
   // fire
   state = digitalRead(8) ? 0 : 1;
-  Joystick[1].setButton(0,state);
+  if (state!=fire2) {
+    fire2 = state;
+    Joystick[1].setButton(0,fire2);
+  }
   // right / left
   state1 = !digitalRead(16); // left
   state2 = !digitalRead(10); // right
