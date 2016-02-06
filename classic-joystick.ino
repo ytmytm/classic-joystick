@@ -44,6 +44,11 @@ enum class Joy2 : uint8_t { up=4, down=5, left=6, right=7, fire=8, potx=A2, poty
 enum class Joy1key { up='w', down='s', left='a', right='d', fire=' ' };
 enum class Joy2key { up=KEY_UP_ARROW, down=KEY_DOWN_ARROW, left=KEY_LEFT_ARROW, right=KEY_RIGHT_ARROW, fire=KEY_RIGHT_CTRL };
 
+bool useKeyboard = false;
+bool bannerShown = false;
+
+#define SERIAL_SPEED 115200
+
 void setup() {
   // joy1
   pinMode((uint8_t)Joy1::poty,INPUT_PULLUP);
@@ -64,7 +69,8 @@ void setup() {
 
   Joystick[1].begin();
   Joystick[0].begin();
-  Keyboard.begin();
+
+  Serial.begin(SERIAL_SPEED);
 }
 
 int state1x=0, state1y=0, state2x=0, state2y=0, fire1=0, fire2=0;
@@ -77,10 +83,12 @@ void loop() {
   // fire
   state = digitalRead((uint8_t)Joy1::fire) ? 0 : 1;
   if (state!=fire1) {
-    if (fire1) {
-      Keyboard.release((uint8_t)Joy1key::fire);
-    } else {
-      Keyboard.press((uint8_t)Joy1key::fire);
+    if (useKeyboard) {
+      if (fire1) {
+        Keyboard.release((uint8_t)Joy1key::fire);
+      } else {
+        Keyboard.press((uint8_t)Joy1key::fire);
+      }
     }
     fire1 = state;
     Joystick[0].setButton(0,fire1);
@@ -88,10 +96,12 @@ void loop() {
   // fire
   state = digitalRead((uint8_t)Joy2::fire) ? 0 : 1;
   if (state!=fire2) {
-    if (fire2) {
-      Keyboard.release((uint8_t)Joy2key::fire);
-    } else {
-      Keyboard.press((uint8_t)Joy2key::fire);
+    if (useKeyboard) {
+      if (fire2) {
+        Keyboard.release((uint8_t)Joy2key::fire);
+      } else {
+        Keyboard.press((uint8_t)Joy2key::fire);
+      }
     }
     fire2 = state;
     Joystick[1].setButton(0,fire2);
@@ -103,10 +113,12 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state1x) {
-    if (state1x==-127) Keyboard.release((uint8_t)Joy1key::left);
-    if (state1x==127) Keyboard.release((uint8_t)Joy1key::right);
-    if (state==-127) Keyboard.press((uint8_t)Joy1key::left);
-    if (state==127) Keyboard.press((uint8_t)Joy1key::right);
+    if (useKeyboard) {
+      if (state1x==-127) Keyboard.release((uint8_t)Joy1key::left);
+      if (state1x==127) Keyboard.release((uint8_t)Joy1key::right);
+      if (state==-127) Keyboard.press((uint8_t)Joy1key::left);
+      if (state==127) Keyboard.press((uint8_t)Joy1key::right);
+    }
     state1x = state;
     Joystick[0].setXAxis(state1x);
   }
@@ -117,10 +129,12 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state2x) {
-    if (state2x==-127) Keyboard.release((uint8_t)Joy2key::left);
-    if (state2x==127) Keyboard.release((uint8_t)Joy2key::right);
-    if (state==-127) Keyboard.press((uint8_t)Joy2key::left);
-    if (state==127) Keyboard.press((uint8_t)Joy2key::right);
+    if (useKeyboard) {
+      if (state2x==-127) Keyboard.release((uint8_t)Joy2key::left);
+      if (state2x==127) Keyboard.release((uint8_t)Joy2key::right);
+      if (state==-127) Keyboard.press((uint8_t)Joy2key::left);
+      if (state==127) Keyboard.press((uint8_t)Joy2key::right);
+    }
     state2x = state;
     Joystick[1].setXAxis(state2x);
   }
@@ -132,10 +146,12 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state1y) {
-    if (state1y==-127) Keyboard.release((uint8_t)Joy1key::up);
-    if (state1y==127) Keyboard.release((uint8_t)Joy1key::down);
-    if (state==-127) Keyboard.press((uint8_t)Joy1key::up);
-    if (state==127) Keyboard.press((uint8_t)Joy1key::down);
+    if (useKeyboard) {
+      if (state1y==-127) Keyboard.release((uint8_t)Joy1key::up);
+      if (state1y==127) Keyboard.release((uint8_t)Joy1key::down);
+      if (state==-127) Keyboard.press((uint8_t)Joy1key::up);
+      if (state==127) Keyboard.press((uint8_t)Joy1key::down);
+    }
     state1y = state;
     Joystick[0].setYAxis(state1y);
   }
@@ -146,12 +162,37 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state2y) {
-    if (state2y==-127) Keyboard.release((uint8_t)Joy2key::up);
-    if (state2y==127) Keyboard.release((uint8_t)Joy2key::down);
-    if (state==-127) Keyboard.press((uint8_t)Joy2key::up);
-    if (state==127) Keyboard.press((uint8_t)Joy2key::down);
+    if (useKeyboard) {
+      if (state2y==-127) Keyboard.release((uint8_t)Joy2key::up);
+      if (state2y==127) Keyboard.release((uint8_t)Joy2key::down);
+      if (state==-127) Keyboard.press((uint8_t)Joy2key::up);
+      if (state==127) Keyboard.press((uint8_t)Joy2key::down);
+    }
     state2y = state;
     Joystick[1].setYAxis(state2y);
+  }
+
+  if (Serial && !bannerShown) {
+    bannerShown = true;
+    Serial.println("Classic 8-bit era joystick interface");
+    Serial.println("Maciej Witkowiak <mwitkowiak@gmail.com> 2016");
+    Serial.println("\n\npress 'k' to toggle keyboard emulation");
+    Serial.println("\nopen this serial port with 1200 baud speed to reset device");
+    Serial.println("\nENJOY!");
+  }
+  if (Serial.available()) {
+    uint8_t c = Serial.read();
+    if (c=='k') {
+      useKeyboard = !useKeyboard;
+      if (useKeyboard) {
+        Serial.print("Keyboard emulation ON: Joy#1 WSAD+space, Joy#2 arrows+right ctrl");
+        Keyboard.begin();
+      } else {
+        Serial.print("Keyboard emulation OFF");
+        Keyboard.end();
+      }
+      Serial.println(" (press 'k' to toggle this setting)");
+    }
   }
 
   delay(10);
