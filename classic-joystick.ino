@@ -37,23 +37,26 @@
 
 #include "Joystick2.h"
 
+enum class Joy1 : uint8_t { up=15, down=14, left=16, right=10, fire=9, potx=A0, poty=A1 };
+enum class Joy2 : uint8_t { up=4, down=5, left=6, right=7, fire=8, potx=A2, poty=A3 };
+
 void setup() {
   // joy1
-  pinMode(A1,INPUT_PULLUP); // poty
-  pinMode(A0,INPUT_PULLUP); // potx
-  pinMode(15,INPUT_PULLUP); // up
-  pinMode(14,INPUT_PULLUP); // down
-  pinMode(16,INPUT_PULLUP); // left
-  pinMode(10,INPUT_PULLUP); // right
-  pinMode(9,INPUT_PULLUP); // fire
+  pinMode((uint8_t)Joy1::poty,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::potx,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::up,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::down,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::left,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::right,INPUT_PULLUP);
+  pinMode((uint8_t)Joy1::fire,INPUT_PULLUP);
   // joy2
-  pinMode(A3,INPUT_PULLUP); // poty
-  pinMode(A2,INPUT_PULLUP); // potx
-  pinMode(8,INPUT_PULLUP); // fire
-  pinMode(7,INPUT_PULLUP); // right
-  pinMode(6,INPUT_PULLUP); // left
-  pinMode(5,INPUT_PULLUP); // down
-  pinMode(4,INPUT_PULLUP); // up
+  pinMode((uint8_t)Joy2::poty,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::potx,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::up,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::down,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::left,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::right,INPUT_PULLUP);
+  pinMode((uint8_t)Joy2::fire,INPUT_PULLUP);
 
   Joystick[1].begin();
   Joystick[0].begin();
@@ -62,26 +65,25 @@ void setup() {
 int state1x=0, state1y=0, state2x=0, state2y=0, fire1=0, fire2=0;
 
 void loop() {
-  uint8_t joy1=0;
   uint8_t state1, state2;
   int8_t state;
 
   // reversed logic because closed switch connects to GND, open is pulled up
   // fire
-  state = digitalRead(9) ? 0 : 1;
+  state = digitalRead((uint8_t)Joy1::fire) ? 0 : 1;
   if (state!=fire1) {
     fire1 = state;
     Joystick[0].setButton(0,fire1);
   }
   // fire
-  state = digitalRead(8) ? 0 : 1;
+  state = digitalRead((uint8_t)Joy2::fire) ? 0 : 1;
   if (state!=fire2) {
     fire2 = state;
     Joystick[1].setButton(0,fire2);
   }
   // right / left
-  state1 = !digitalRead(16); // left
-  state2 = !digitalRead(10); // right
+  state1 = !digitalRead((uint8_t)Joy1::left);
+  state2 = !digitalRead((uint8_t)Joy1::right);
   state = 0;
   if (state1) state=-127;
   if (state2) state=127;
@@ -90,8 +92,8 @@ void loop() {
     Joystick[0].setXAxis(state1x);
   }
   // right / left
-  state1 = !digitalRead(6); // left
-  state2 = !digitalRead(7); // right
+  state1 = !digitalRead((uint8_t)Joy2::left);
+  state2 = !digitalRead((uint8_t)Joy2::right);
   state = 0;
   if (state1) state=-127;
   if (state2) state=127;
@@ -101,8 +103,8 @@ void loop() {
   }
   //
   // up / down
-  state1 = !digitalRead(15); // up
-  state2 = !digitalRead(14); // down
+  state1 = !digitalRead((uint8_t)Joy1::up);
+  state2 = !digitalRead((uint8_t)Joy1::down);
   state = 0;
   if (state1) state=-127;
   if (state2) state=127;
@@ -111,8 +113,8 @@ void loop() {
     Joystick[0].setYAxis(state1y);
   }
   // up / down
-  state1 = !digitalRead(4); // up
-  state2 = !digitalRead(5); // down
+  state1 = !digitalRead((uint8_t)Joy2::up);
+  state2 = !digitalRead((uint8_t)Joy2::down);
   state = 0;
   if (state1) state=-127;
   if (state2) state=127;
@@ -123,4 +125,3 @@ void loop() {
 
   delay(10);
 }
-
