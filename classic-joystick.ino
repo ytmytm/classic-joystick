@@ -35,10 +35,14 @@
 // GND -> joystick 2 GND (8)
 // A2 -> joystick 2 POTX (9)
 
+#include "Keyboard.h"
 #include "Joystick2.h"
 
 enum class Joy1 : uint8_t { up=15, down=14, left=16, right=10, fire=9, potx=A0, poty=A1 };
 enum class Joy2 : uint8_t { up=4, down=5, left=6, right=7, fire=8, potx=A2, poty=A3 };
+
+enum class Joy1key { up='w', down='s', left='a', right='d', fire=' ' };
+enum class Joy2key { up=KEY_UP_ARROW, down=KEY_DOWN_ARROW, left=KEY_LEFT_ARROW, right=KEY_RIGHT_ARROW, fire=KEY_RIGHT_CTRL };
 
 void setup() {
   // joy1
@@ -60,6 +64,7 @@ void setup() {
 
   Joystick[1].begin();
   Joystick[0].begin();
+  Keyboard.begin();
 }
 
 int state1x=0, state1y=0, state2x=0, state2y=0, fire1=0, fire2=0;
@@ -72,12 +77,22 @@ void loop() {
   // fire
   state = digitalRead((uint8_t)Joy1::fire) ? 0 : 1;
   if (state!=fire1) {
+    if (fire1) {
+      Keyboard.release((uint8_t)Joy1key::fire);
+    } else {
+      Keyboard.press((uint8_t)Joy1key::fire);
+    }
     fire1 = state;
     Joystick[0].setButton(0,fire1);
   }
   // fire
   state = digitalRead((uint8_t)Joy2::fire) ? 0 : 1;
   if (state!=fire2) {
+    if (fire2) {
+      Keyboard.release((uint8_t)Joy2key::fire);
+    } else {
+      Keyboard.press((uint8_t)Joy2key::fire);
+    }
     fire2 = state;
     Joystick[1].setButton(0,fire2);
   }
@@ -88,6 +103,10 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state1x) {
+    if (state1x==-127) Keyboard.release((uint8_t)Joy1key::left);
+    if (state1x==127) Keyboard.release((uint8_t)Joy1key::right);
+    if (state==-127) Keyboard.press((uint8_t)Joy1key::left);
+    if (state==127) Keyboard.press((uint8_t)Joy1key::right);
     state1x = state;
     Joystick[0].setXAxis(state1x);
   }
@@ -98,6 +117,10 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state2x) {
+    if (state2x==-127) Keyboard.release((uint8_t)Joy2key::left);
+    if (state2x==127) Keyboard.release((uint8_t)Joy2key::right);
+    if (state==-127) Keyboard.press((uint8_t)Joy2key::left);
+    if (state==127) Keyboard.press((uint8_t)Joy2key::right);
     state2x = state;
     Joystick[1].setXAxis(state2x);
   }
@@ -109,6 +132,10 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state1y) {
+    if (state1y==-127) Keyboard.release((uint8_t)Joy1key::up);
+    if (state1y==127) Keyboard.release((uint8_t)Joy1key::down);
+    if (state==-127) Keyboard.press((uint8_t)Joy1key::up);
+    if (state==127) Keyboard.press((uint8_t)Joy1key::down);
     state1y = state;
     Joystick[0].setYAxis(state1y);
   }
@@ -119,9 +146,14 @@ void loop() {
   if (state1) state=-127;
   if (state2) state=127;
   if (state!=state2y) {
+    if (state2y==-127) Keyboard.release((uint8_t)Joy2key::up);
+    if (state2y==127) Keyboard.release((uint8_t)Joy2key::down);
+    if (state==-127) Keyboard.press((uint8_t)Joy2key::up);
+    if (state==127) Keyboard.press((uint8_t)Joy2key::down);
     state2y = state;
     Joystick[1].setYAxis(state2y);
   }
 
   delay(10);
 }
+
