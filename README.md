@@ -67,22 +67,35 @@ DB9 joystick port (front, looking at pins)
 | A2 | 9 | joystick 2 POTX |
 
 
-POTX/POTY lines are unsupported
--------------------------------
+More buttons & more joystick systems
+------------------------------------
 
-Currently lines POTX/POTY are connected to analog inputs, but they are not used in any way.
-The internal pullup resistors are turned on so they work as voltage dividers.
+With little effort the code can be reconfigured to support multisystem joysticks with up to 3 buttons.
 
-Reading these lines directly will give huge positional error due to non-linearity of measurement.
+[Here is a very helpful table with possible configurations.](http://wiki.icomp.de/wiki/DB9-Joystick)
 
-Proper way (utilized by C64/C128 SID chip) would be to use one capacitor on each line and measure the time it takes to charge it.
+This could be even done during runtime through serial interface text menu.
+
+Paddles POTX/POTY are not supported
+------------------------------------
+
+Currently lines POTX/POTY are connected to analog inputs of ATmega, but they are not used in any way.
+
+The internal pullup resistors are turned on so the potentiometers in attached controllers (paddles, spinners) would work as voltage dividers.
+
+Reading raw analog values from these lines will give huge positional error due to non-linearity of measurement.
+
+The proper way to do it would be to use one capacitor on each line and measure the time it takes to charge it. This method is used by SID chip in C64/128.
 
 [This project entry might be helpful](https://hackaday.io/project/7941-avercade/log/26877-rewiring-for-dual-atari-controller).
 
-I don't have any controllers that would use these lines, so I'm not interested in implementing it right now.
+[According to this table](http://wiki.icomp.de/wikti/DB9-Joystick)) POTX/POTY can be used in the same way as FIRE button and act as button 2 and 3 lines if connected to GND.
+It would work without any hardware changes, but I don't know about any C64/128 game that would use this feature.
+
+At the moment I don't have any controllers that would use these lines, so I'm not interested in implementing it.
 
 Project page
 ------------
 
-For more details about the hardware build please go to [project page on hackaday.io](https://hackaday.io/)
+Please visit also [project page on hackaday.io](https://hackaday.io/project/9552-digital-joystick-8-bit-to-usb-adapter)
 
