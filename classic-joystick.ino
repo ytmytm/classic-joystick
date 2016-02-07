@@ -41,8 +41,8 @@
 enum class Joy1 : uint8_t { up=15, down=14, left=16, right=10, fire=9, potx=A0, poty=A1 };
 enum class Joy2 : uint8_t { up=4, down=5, left=6, right=7, fire=8, potx=A2, poty=A3 };
 
-enum class Joy1key { up='w', down='s', left='a', right='d', fire=' ' };
-enum class Joy2key { up=KEY_UP_ARROW, down=KEY_DOWN_ARROW, left=KEY_LEFT_ARROW, right=KEY_RIGHT_ARROW, fire=KEY_RIGHT_CTRL };
+enum class Joy1key : uint8_t { up='w', down='s', left='a', right='d', fire=' ' };
+enum class Joy2key : uint8_t { up=KEY_UP_ARROW, down=KEY_DOWN_ARROW, left=KEY_LEFT_ARROW, right=KEY_RIGHT_ARROW, fire=KEY_RIGHT_CTRL };
 
 bool useKeyboard = false;
 bool bannerShown = false;
