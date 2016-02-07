@@ -89,7 +89,7 @@ The proper way to do it would be to use one capacitor on each line and measure t
 
 [This project entry might be helpful](https://hackaday.io/project/7941-avercade/log/26877-rewiring-for-dual-atari-controller).
 
-[According to this table](http://wiki.icomp.de/wikti/DB9-Joystick)) POTX/POTY can be used in the same way as FIRE button and act as button 2 and 3 lines if connected to VCC.
+[According to this table](http://wiki.icomp.de/wikti/DB9-Joystick) POTX/POTY can be used in the same way as FIRE button and act as button 2 and 3 lines if connected to VCC.
 This would require adding pulldown resistors and I don't know about any C64/128 game that would use this feature.
 
 So it seems that support for POTX/POTY requires additional capacitors or resistors.
