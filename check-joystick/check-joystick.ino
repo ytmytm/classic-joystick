@@ -1,5 +1,5 @@
 
-// 2015, Maciej Witkowiak <mwitkowiak@gmail.com>
+// 2016, Maciej Witkowiak <mwitkowiak@gmail.com>
 
 // simple test for checking all the connections to two digital
 // digital (8-bit era) joysticks

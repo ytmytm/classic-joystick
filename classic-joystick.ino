@@ -1,5 +1,5 @@
 
-// 2015, Maciej Witkowiak <mwitkowiak@gmail.com>
+// 2016, Maciej Witkowiak <mwitkowiak@gmail.com>
 
 // support for C64/128 joystick:
 // 4-way control+1 fire button
