@@ -34,10 +34,10 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xa1, 0x01,               // COLLECTION (Application)
     0x85, JOYSTICK_REPORT_ID, // REPORT_ID (3)
 
-    // 16 Buttons
+    // 1 button
     0x05, 0x09,               //   USAGE_PAGE (Button)
     0x19, 0x01,               //   USAGE_MINIMUM (Button 1)
-    0x29, 0x10,               //   USAGE_MAXIMUM (Button 16)
+    0x29, 0x01,               //   USAGE_MAXIMUM (Button 1)
     0x15, 0x00,               //   LOGICAL_MINIMUM (0)
     0x25, 0x01,               //   LOGICAL_MAXIMUM (1)
     0x75, 0x01,               //   REPORT_SIZE (1)
@@ -66,10 +66,10 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xa1, 0x01,                // COLLECTION (Application)
     0x85, JOYSTICK2_REPORT_ID, // REPORT_ID (4)
 
-    // 16 Buttons
+    // 1 button
     0x05, 0x09,                //   USAGE_PAGE (Button)
     0x19, 0x01,                //   USAGE_MINIMUM (Button 1)
-    0x29, 0x10,                //   USAGE_MAXIMUM (Button 16)
+    0x29, 0x01,                //   USAGE_MAXIMUM (Button 1)
     0x15, 0x00,                //   LOGICAL_MINIMUM (0)
     0x25, 0x01,                //   LOGICAL_MAXIMUM (1)
     0x75, 0x01,                //   REPORT_SIZE (1)
