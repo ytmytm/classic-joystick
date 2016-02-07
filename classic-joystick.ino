@@ -2,7 +2,7 @@
 // 2015, Maciej Witkowiak <mwitkowiak@gmail.com>
 
 // support for C64/128 joystick:
-// 5-way control+1 fire button
+// 4-way control+1 fire button
 // potx/y lines are connected but not handled
 
 // DB9 joystick cable (front, looking at holes)
