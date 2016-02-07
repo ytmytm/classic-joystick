@@ -172,10 +172,4 @@ void Joystick_::sendState()
     HID().SendReport(JOYSTICK_REPORT_ID + joystickId, data, JOYSTICK_STATE_SIZE);
 }
 
-Joystick_ Joystick[2] =
-{
-    Joystick_(0),
-    Joystick_(1)
-};
-
 #endif
