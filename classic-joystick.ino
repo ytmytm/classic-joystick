@@ -68,7 +68,7 @@ class JoyAxis {
       }
       return(false);
     }
-    int8_t getState() { return(m_state); };
+    int8_t getState() const { return(m_state); };
   private:
     uint8_t m_pinleft, m_pinright;
     uint8_t m_keyleft, m_keyright;
@@ -97,7 +97,7 @@ class JoyTrigger {
       }
       return(false);
     }
-    int8_t getState() { return(m_state); };
+    int8_t getState() const { return(m_state); };
   private:
     uint8_t m_pintrigger, m_keytrigger, m_state{0};
 };
