@@ -43,95 +43,102 @@ bool g_bannerShown = false;
 
 #define SERIAL_SPEED 115200
 
-class DigitalJoystick {
+class JoyAxis {
   public:
-    DigitalJoystick(const Joystick_ usbJoystick,
-                    const uint8_t pinup, const uint8_t pindown, const uint8_t pinleft, const uint8_t pinright, const uint8_t pinfire,
-                    const uint8_t keyup, const uint8_t keydown, const uint8_t keyleft, const uint8_t keyright, const uint8_t keyfire,
-                    const uint8_t potx, const uint8_t poty);
-    void update(bool useKeyboard);
+    JoyAxis(const uint8_t pinleft, const uint8_t pinright, const uint8_t keyleft, const uint8_t keyright) :
+      m_pinleft(pinleft), m_pinright(pinright), m_keyleft(keyleft), m_keyright(keyright) {
+        pinMode(m_pinleft, INPUT_PULLUP);
+        pinMode(m_pinright, INPUT_PULLUP);
+      }
+    bool update(bool useKeyboard) {
+      uint8_t state1 = !digitalRead(m_pinleft);
+      uint8_t state2 = !digitalRead(m_pinright);
+      int8_t state = 0;
+      if (state1) state = -127;
+      if (state2) state = 127;
+      if (state != m_state) {
+        if (useKeyboard) {
+          if (m_state == -127) Keyboard.release(m_keyleft);
+          if (m_state == 127) Keyboard.release(m_keyright);
+          if (state == -127) Keyboard.press(m_keyleft);
+          if (state == 127) Keyboard.press(m_keyright);
+        }
+        m_state = state;
+        return(true);
+      }
+      return(false);
+    }
+    int8_t getState() { return(m_state); };
   private:
-    Joystick_ m_usbJoystick;
-    uint8_t m_pinup, m_pindown, m_pinleft, m_pinright, m_pinfire;
-    uint8_t m_keyup, m_keydown, m_keyleft, m_keyright, m_keyfire;
-    uint8_t m_potx, m_poty;
-    int8_t m_statex {0}, m_statey {0}, m_fire {0};
+    uint8_t m_pinleft, m_pinright;
+    uint8_t m_keyleft, m_keyright;
+    int8_t m_state {0};
 };
 
-DigitalJoystick::DigitalJoystick(const Joystick_ usbJoystick,
-                                 const uint8_t pinup, const uint8_t pindown, const uint8_t pinleft, const uint8_t pinright, const uint8_t pinfire,
-                                 const uint8_t keyup, const uint8_t keydown, const uint8_t keyleft, const uint8_t keyright, const uint8_t keyfire,
-                                 const uint8_t potx, const uint8_t poty) :
-  m_usbJoystick(usbJoystick),
-  m_pinup(pinup), m_pindown(pindown), m_pinleft(pinleft), m_pinright(pinright), m_pinfire(pinfire),
-  m_keyup(keyup), m_keydown(keydown), m_keyleft(keyleft), m_keyright(keyright), m_keyfire(keyfire),
-  m_potx(potx), m_poty(poty) {
+class JoyTrigger {
+  public:
+    JoyTrigger(const uint8_t pintrigger, const uint8_t keytrigger) :
+      m_pintrigger(pintrigger), m_keytrigger(keytrigger) {
+        pinMode(pintrigger, INPUT_PULLUP);
+      }
+    bool update(bool useKeyboard) {
+      // reversed logic because closed switch connects to GND, open is pulled up
+      uint8_t state = digitalRead(m_pintrigger) ? 0 : 1;
+      if (state != m_state) {
+        if (useKeyboard) {
+          if (m_state) {
+            Keyboard.release(m_keytrigger);
+          } else {
+            Keyboard.press(m_keytrigger);
+          }
+        }
+        m_state = state;
+        return(true);
+      }
+      return(false);
+    }
+    int8_t getState() { return(m_state); };
+  private:
+    uint8_t m_pintrigger, m_keytrigger, m_state{0};
+};
 
-  pinMode(m_pinup, INPUT_PULLUP);
-  pinMode(m_pindown, INPUT_PULLUP);
-  pinMode(m_pinleft, INPUT_PULLUP);
-  pinMode(m_pinright, INPUT_PULLUP);
-  pinMode(m_pinfire, INPUT_PULLUP);
-  pinMode(m_potx, INPUT_PULLUP);
-  pinMode(m_poty, INPUT_PULLUP);
-  m_usbJoystick.begin();
-}
-
-void DigitalJoystick::update(bool useKeyboard) {
-  uint8_t state1, state2;
-  int8_t state;
-  // reversed logic because closed switch connects to GND, open is pulled up
-  // fire
-  state = digitalRead(m_pinfire) ? 0 : 1;
-  if (state != m_fire) {
-    if (useKeyboard) {
-      if (m_fire) {
-        Keyboard.release(m_keyfire);
-      } else {
-        Keyboard.press(m_keyfire);
+class DigitalJoystick {
+  public:
+    DigitalJoystick(const Joystick_ usbJoystick, const JoyAxis yAxis, const JoyAxis xAxis, const JoyTrigger trigger,
+      const uint8_t potx, const uint8_t poty) :
+      m_usbJoystick(usbJoystick), m_yAxis(yAxis), m_xAxis(xAxis), m_trigger(trigger),
+      m_potx(potx), m_poty(poty)
+      {
+        pinMode(m_potx, INPUT_PULLUP);
+        pinMode(m_poty, INPUT_PULLUP);
+        m_usbJoystick.begin();
+      }
+    void update(bool useKeyboard) {
+      if (m_trigger.update(useKeyboard)) {
+        m_usbJoystick.setButton(0, m_trigger.getState());
+      }
+      if (m_xAxis.update(useKeyboard)) {
+        m_usbJoystick.setXAxis(m_xAxis.getState());
+      }
+      if (m_yAxis.update(useKeyboard)) {
+        m_usbJoystick.setYAxis(m_yAxis.getState());
       }
     }
-    m_fire = state;
-    m_usbJoystick.setButton(0, m_fire);
-  }
-  // right / left
-  state1 = !digitalRead(m_pinleft);
-  state2 = !digitalRead(m_pinright);
-  state = 0;
-  if (state1) state = -127;
-  if (state2) state = 127;
-  if (state != m_statex) {
-    if (useKeyboard) {
-      if (m_statex == -127) Keyboard.release(m_keyleft);
-      if (m_statex == 127) Keyboard.release(m_keyright);
-      if (state == -127) Keyboard.press(m_keyleft);
-      if (state == 127) Keyboard.press(m_keyright);
-    }
-    m_statex = state;
-    m_usbJoystick.setXAxis(m_statex);
-  }
-  // up / down
-  state1 = !digitalRead(m_pinup);
-  state2 = !digitalRead(m_pindown);
-  state = 0;
-  if (state1) state = -127;
-  if (state2) state = 127;
-  if (state != m_statey) {
-    if (useKeyboard) {
-      if (m_statey == -127) Keyboard.release(m_keyup);
-      if (m_statey == 127) Keyboard.release(m_keydown);
-      if (state == -127) Keyboard.press(m_keyup);
-      if (state == 127) Keyboard.press(m_keydown);
-    }
-    m_statey = state;
-    m_usbJoystick.setYAxis(m_statey);
-  }
-}
+  private:
+    Joystick_ m_usbJoystick;
+    JoyTrigger m_trigger;
+    JoyAxis m_xAxis, m_yAxis;
+    uint8_t m_potx, m_poty;
+};
 
 DigitalJoystick digiJoysticks[] = {
   // pins: up, down, left, right, fire; keys: up, down, left, right, fire; pots: x, y
-  DigitalJoystick(Joystick_(1),  4,  5,  6,  7, 8, KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_RIGHT_CTRL, A2, A3),
-  DigitalJoystick(Joystick_(0), 15, 14, 16, 10, 9, 'w', 's', 'a', 'd', ' ', A0, A1)
+  DigitalJoystick(Joystick_(1), JoyAxis(4, 5, KEY_UP_ARROW, KEY_DOWN_ARROW),
+                                JoyAxis(6, 7, KEY_LEFT_ARROW, KEY_RIGHT_ARROW),
+                                JoyTrigger(8, KEY_RIGHT_CTRL), A2, A3),
+  DigitalJoystick(Joystick_(0), JoyAxis(15, 14, 'w', 's'),
+                                JoyAxis(16, 10, 'a', 'd'),
+                                JoyTrigger(9, ' '), A0, A1)
 };
 
 void handleSerialCommands() {
